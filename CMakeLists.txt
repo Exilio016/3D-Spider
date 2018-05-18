@@ -6,11 +6,9 @@ set(CMAKE_CXX_STANDARD 11)
 find_package(OpenGL REQUIRED)
 find_package(GLUT REQUIRED)
 
-include_directories(${OPENGL_INCLUDE_DIRS} ${GLUT_INCLUDE_DIRS})
+include_directories(${OPENGL_INCLUDE_DIRS} ${GLUT_INCLUDE_DIRS} includes)
 
-file(GLOB SOURCES "src/*.cpp" "includes/*.h")
-
-add_executable(Spider ${SOURCES})
+add_executable(Spider src/main.cpp src/spider.cpp includes/spider.h includes/types.h)
 
 #OpenGL libs linker
 target_link_libraries(${PROJECT_NAME} ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES})

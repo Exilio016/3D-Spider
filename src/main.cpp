@@ -3,9 +3,36 @@
 //
 #include <iostream>
 #include <GL/glut.h>
+#include <spider.h>
 
 int width = 800;
 int height = 600;
+Spider *s;
+
+void iluminacao(){
+    GLfloat luzAmbiente[4]={0.2,0.2,0.2,1.0};
+    GLfloat luzDifusa[4]={0.7,0.7,0.7,1.0};          // "cor"
+    GLfloat luzEspecular[4]={1.0, 1.0, 1.0, 1.0};// "brilho"
+    GLfloat posicaoLuz[4]={0.0, 50.0, 50.0, 1.0};
+
+// Capacidade de brilho do material
+    GLfloat especularidade[4]={1.0,1.0,1.0,1.0};
+    GLint especMaterial = 60;
+
+// Define a refletância do material
+    glMaterialfv(GL_FRONT,GL_SPECULAR, especularidade);
+// Define a concentração do brilho
+    glMateriali(GL_FRONT,GL_SHININESS,especMaterial);
+
+// Ativa o uso da luz ambiente
+    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, luzAmbiente);
+
+// Define os parâmetros da luz de número 0
+    glLightfv(GL_LIGHT0, GL_AMBIENT, luzAmbiente);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, luzDifusa );
+    glLightfv(GL_LIGHT0, GL_SPECULAR, luzEspecular );
+    glLightfv(GL_LIGHT0, GL_POSITION, posicaoLuz );
+}
 
 /**
  * @desc Desenha eixos de um sistema de coordenadas.
@@ -96,44 +123,40 @@ void displayCallback()
     glClear(GL_COLOR_BUFFER_BIT);
 
     glColor3f(1.0f, 0.0f, 0.0f);
+    iluminacao();
 
     /** Desenha a janela mais a esquerda */
     glViewport(0, 0, width/2, height/2);
     glLoadIdentity();
     gluLookAt(3.0, 2.0, 10.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
-    drawGrid(30, 0.7);
+    drawGrid(300, 0.7);
     drawWCAxes();
-    glRotatef(-90.0, 1.0, 0.0, 0.0);
-    glutWireCone(1.0, 2.0, 4, 4);
+   // glRotatef(-90.0, 1.0, 0.0, 0.0);
+    s->draw();
+
     //Desenhar aranha
 
     /** Desenha a janela mais a direita */
     glViewport(width/2, 0, width/2, height/2);
     glLoadIdentity();
     gluLookAt(0.0, 10.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0);
-    drawGrid(30, 0.7);
+    drawGrid(300, 0.7);
     drawWCAxes();
-    glRotatef(-90.0, 1.0, 0.0, 0.0);
-    glutWireCone(1.0, 2.0, 4, 4);
-    //Desenhar Aranha
+    s->draw();
 
     glViewport(0, height/2, width/2, height/2);
     glLoadIdentity();
     gluLookAt(10.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
-    drawGrid(30, 0.7);
+    drawGrid(300, 0.7);
     drawWCAxes();
-    glRotatef(-90.0, 1.0, 0.0, 0.0);
-    glutWireCone(1.0, 2.0, 4, 4);
-    //Desenhar Aranha
+    s->draw();
 
     glViewport(width/2, height/2, width/2, height/2);
     glLoadIdentity();
     gluLookAt(0.0, 0.0, 10.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
-    drawGrid(30, 0.7);
+    drawGrid(300, 0.7);
     drawWCAxes();
-    glRotatef(-90.0, 1.0, 0.0, 0.0);
-    glutWireCone(1.0, 2.0, 4, 4);
-    //Desenhar Aranha
+    s->draw();
 
     /** Dispara os comandos APENAS uma vez */
     glFlush();
@@ -156,6 +179,24 @@ void reshapeCallback(int w, int h)
     glMatrixMode(GL_MODELVIEW);
 }
 
+void init(){
+    // Define a cor de fundo da janela de visualização como branca
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+
+    // Habilita a definição da cor do material a partir da cor corrente
+    glEnable(GL_COLOR_MATERIAL);
+    //Habilita o uso de iluminação
+    glEnable(GL_LIGHTING);
+    // Habilita a luz de número 0
+    glEnable(GL_LIGHT0);
+    // Habilita o depth-buffering
+    glEnable(GL_DEPTH_TEST);
+
+    // Habilita o modelo de colorização de Gouraud
+    glShadeModel(GL_SMOOTH);
+    s = new Spider();
+}
+
 int main(int argc, char **argv)
 {
     /** Passo 1: Inicializa funções GLUT */
@@ -165,6 +206,8 @@ int main(int argc, char **argv)
     glutInitWindowSize(width, height);
     glutCreateWindow("Spider 3D");
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+
+    init();
 
     /** Passo 2: Registra callbacks da OpenGl */
     glutDisplayFunc(displayCallback);
