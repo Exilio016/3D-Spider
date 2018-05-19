@@ -5,6 +5,8 @@
 #include <GL/glut.h>
 #include <spider.h>
 
+#define FRAMES 24
+
 int width = 800;
 int height = 600;
 Spider *s;
@@ -13,7 +15,7 @@ void iluminacao(){
     GLfloat luzAmbiente[4]={0.2,0.2,0.2,1.0};
     GLfloat luzDifusa[4]={0.7,0.7,0.7,1.0};          // "cor"
     GLfloat luzEspecular[4]={1.0, 1.0, 1.0, 1.0};// "brilho"
-    GLfloat posicaoLuz[4]={0.0, 50.0, 50.0, 1.0};
+    GLfloat posicaoLuz[4]={3.0, 200.0, 10.0, 1.0};
 
 // Capacidade de brilho do material
     GLfloat especularidade[4]={1.0,1.0,1.0,1.0};
@@ -197,6 +199,24 @@ void init(){
     s = new Spider();
 }
 
+void keyboard_callback(int key, int x, int y){
+    if(key == GLUT_KEY_UP)
+        s->move(true);
+    if(key == GLUT_KEY_DOWN)
+        s->move(false);
+    if(key == GLUT_KEY_LEFT)
+        s->rotate(false);
+    if(key == GLUT_KEY_RIGHT)
+        s->rotate(true);
+
+}
+
+void update(int a){
+    glutPostRedisplay();
+    displayCallback();
+    glutTimerFunc(1000/FRAMES, update, 0);
+}
+
 int main(int argc, char **argv)
 {
     /** Passo 1: Inicializa funções GLUT */
@@ -212,6 +232,8 @@ int main(int argc, char **argv)
     /** Passo 2: Registra callbacks da OpenGl */
     glutDisplayFunc(displayCallback);
     glutReshapeFunc(reshapeCallback);
+    glutSpecialFunc(keyboard_callback);
+    glutTimerFunc(1000/FRAMES, update, 0);
 
     /** Passo 3: Executa o programa */
     glutMainLoop();
