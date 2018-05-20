@@ -57,8 +57,8 @@ void draw_cylinder(GLdouble radius, GLdouble height)
 void Spider::draw() {
     glColor3f(1, 0, 0);
     glPushMatrix();
-    glRotated(angle, 0, 1, 0);
     glTranslated(position->x, position->y, position->z);
+    glRotated(angle, 0, 1, 0);
 
     glPushMatrix(); //Draw spider abdome
     glTranslated(-TORAX_SIZE, 0, 0);
@@ -74,18 +74,21 @@ void Spider::draw() {
     for (int i = 1; i < 12; i++) {
     glPushMatrix(); //Draw spider cephalothorax
     glTranslated(TORAX_SIZE/2 - TORAX_SIZE/8, 0, 0);
-       if (i%3) {
+       if (i != 5 && i != 7 && i != 12 && i != 6) {
           point *o = new point;
          o->y = 0;
     
          o->x = (TORAX_SIZE/2) * cos(M_PI*i/6);
          o->z = (TORAX_SIZE/2) * sin(M_PI*i/6);
 
+         double x_ang = (i == 1 || i == 11 ) ? 45 : 0;
+         x_ang = (i == 8 ||i == 4) ? -45 : x_ang;
+
          if (i < 6)
-            draw_leg(o, 45, 45, 45, false);
+            draw_leg(o, 45, 45, x_ang, false);
          else
-            draw_leg(o, 45, 45, 45, true);
-       }
+            draw_leg(o, 45, 45, x_ang, true);
+      }
     glPopMatrix();
     }
 
@@ -106,6 +109,7 @@ void Spider::move(bool forward){
     p->z = 0;
 
     rotate_point(p, angle);
+
     position->x += p->x;
     position->z += p->z;
 }
@@ -120,24 +124,27 @@ void Spider::rotate(bool right){
 void Spider::draw_leg(point *orig, double leg_ang, double artic_ang, double x_ang, bool sideRight) {
     if(orig == nullptr) return;
 
-    //remover
-    //int side = (sideRight ? 1 : 0);
+    int side = (sideRight ? -1 : 1);
 
     glPushMatrix();
-    //glRotated(180*side, 0, 1, 0); remover
     glTranslated(orig->x, orig->y, orig->z);
 
-    glPushMatrix();
-    glRotated(leg_ang, 0, 0, 1);
-    glRotated(x_ang, 0, 1, 0);
-    draw_cylinder(LEG_RADIUS, LEG_SIZE/2);
+    double ym = LEG_SIZE/2 * sin(leg_ang);
+    double zm = LEG_SIZE/2 * cos(leg_ang);
+    double xm = zm * sin(x_ang);
 
-    glPushMatrix();
-    glRotated(artic_ang, 0, 0, 1);
-    glTranslated(0, 0, LEG_SIZE/2 - LEG_SIZE/8);
-    draw_cylinder(LEG_RADIUS, LEG_SIZE/2);
-    glPopMatrix();
+    double y = ym - LEG_SIZE/2 * sin(artic_ang);
+    double z = zm +  LEG_SIZE/2 * cos(artic_ang);
+    double x = z * sin(x_ang);
 
-    glPopMatrix();
+    glLineWidth(LEG_RADIUS);
+    glBegin(GL_LINES);
+    glVertex3d(0, 0, 0);
+    glVertex3d(xm, ym, side*zm);
+    glVertex3d(xm, ym, side *zm);
+    glVertex3d(x, y, side*z);
+    glEnd();
+    glLineWidth(1);
+
     glPopMatrix();
 }
