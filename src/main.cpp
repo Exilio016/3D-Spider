@@ -4,6 +4,7 @@
 #include <iostream>
 #include <GL/glut.h>
 #include <spider.h>
+#include <types.h>
 
 #define FRAMES 24
 
@@ -101,33 +102,37 @@ void displayCallback()
     glClear(GL_COLOR_BUFFER_BIT);
 
     glColor3f(1.0f, 0.0f, 0.0f);
-  //  iluminacao();
+
+    double x,y,z;
+    x = s->getPosition()->x;
+    y = s->getPosition()->y;
+    z = s->getPosition()->z;
 
     /** Desenha a janela mais a esquerda */
     glViewport(0, 0, width/2, height/2);
     glLoadIdentity();
-    gluLookAt(3.0, 2.0, 10.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+    gluLookAt(3.0 + x, 2.0 + y, 10.0 + z, x, y, z, 0.0, 1.0, 0.0);
     drawGrid(300, 0.7);
     drawWCAxes();
     s->draw();
 
     glViewport(width/2, 0, width/2, height/2);
     glLoadIdentity();
-    gluLookAt(0.0, 10.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0);
+    gluLookAt(0.0 + x, 10.0 + y, 0.0 + z, x, y, z, 1.0, 0.0, 0.0);
     drawGrid(300, 0.7);
     drawWCAxes();
     s->draw();
 
     glViewport(0, height/2, width/2, height/2);
     glLoadIdentity();
-    gluLookAt(10.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+    gluLookAt(10.0 + x, 0.0 + y, 0.0 + z, x, y, z, 0.0, 1.0, 0.0);
     drawGrid(300, 0.7);
     drawWCAxes();
     s->draw();
 
     glViewport(width/2, height/2, width/2, height/2);
     glLoadIdentity();
-    gluLookAt(0.0, 0.0, 10.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+    gluLookAt(0.0 + x, 0.0 + y, 10.0 + z, x, y, z, 0.0, 1.0, 0.0);
     drawGrid(300, 0.7);
     drawWCAxes();
     s->draw();

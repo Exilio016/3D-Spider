@@ -29,6 +29,8 @@ public:
     void move(bool forward);
 
     void rotate(bool right);
+
+    point *getPosition();
 };
 
 
