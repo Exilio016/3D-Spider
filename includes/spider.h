@@ -11,8 +11,8 @@
 class Spider {
 private:
     const double TORAX_SIZE = 2;
-    const double LEG_SIZE = 2;
-    const double LEG_RADIUS = 0.15;
+    const double LEG_SIZE = 5;
+    const double LEG_RADIUS = 2;
     const double MOVE_LENGTH = 1;
     const double ROTATE_ANG = 10;
 
