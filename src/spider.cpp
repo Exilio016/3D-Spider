@@ -60,26 +60,36 @@ void Spider::draw() {
     glRotated(angle, 0, 1, 0);
     glTranslated(position->x, position->y, position->z);
 
-    glPushMatrix(); //Draw spider torax
+    glPushMatrix(); //Draw spider abdome
     glTranslated(-TORAX_SIZE, 0, 0);
     glutSolidSphere(TORAX_SIZE, 100, 100);
     glPopMatrix();
 
-    glPushMatrix(); //Draw spider head
+    glPushMatrix(); //Draw spider cephalothorax
     glTranslated(TORAX_SIZE/2 - TORAX_SIZE/8, 0, 0);
     glutSolidSphere(TORAX_SIZE/2, 100, 100);
     glPopMatrix();
 
     //TODO Draw spider legs
-    point *o = new point;
-    o->y = 0;
-    o->x = (TORAX_SIZE/2 - TORAX_SIZE/8) + sin(M_PI/6);
-    o->z = (TORAX_SIZE/2 - TORAX_SIZE/8) - cos(M_PI/6);
+    for (int i = 1; i < 12; i++) {
+    glPushMatrix(); //Draw spider cephalothorax
+    glTranslated(TORAX_SIZE/2 - TORAX_SIZE/8, 0, 0);
+       if (i%3) {
+          point *o = new point;
+         o->y = 0;
+    
+         o->x = (TORAX_SIZE/2) * cos(M_PI*i/6);
+         o->z = (TORAX_SIZE/2) * sin(M_PI*i/6);
 
-    draw_leg(o, 45, 45, 45, false);
+         if (i < 6)
+            draw_leg(o, 45, 45, 45, false);
+         else
+            draw_leg(o, 45, 45, 45, true);
+       }
+    glPopMatrix();
+    }
 
-    glPopMatrix(); //Apply the first transformation;
-
+    glPopMatrix();
 }
 
 Spider::Spider() {
@@ -110,10 +120,11 @@ void Spider::rotate(bool right){
 void Spider::draw_leg(point *orig, double leg_ang, double artic_ang, double x_ang, bool sideRight) {
     if(orig == nullptr) return;
 
-    int side = (sideRight ? 0 : 1);
+    //remover
+    //int side = (sideRight ? 1 : 0);
 
     glPushMatrix();
-    glRotated(180*side, 0, 1, 0);
+    //glRotated(180*side, 0, 1, 0); remover
     glTranslated(orig->x, orig->y, orig->z);
 
     glPushMatrix();
