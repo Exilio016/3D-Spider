@@ -8,50 +8,15 @@
 #include <types.h>
 
 
-/* i j k
- * x y h
- * r 0 h
- *
- * y*h(i) - x*h+r*h(j) -r*y(k)
- */
-
 void rotate_point (point *p, double angle){
-    p->z =  p->z * cos(angle*M_PI/180) + p->z * sin(angle*M_PI/180);
-    p->x = p->x * -sin(angle*M_PI/180) + p->x * cos(angle*M_PI/180);
-}
+    double x,y,z;
+    x = p->x;
+    y = p->y;
+    z = p->z;
 
-void draw_cylinder(GLdouble radius, GLdouble height)
-{
-    GLdouble x              = 0.0;
-    GLdouble y              = 0.0;
-    GLdouble angle          = 0.0;
-    GLdouble angle_stepsize = 0.1;
-
-    glBegin(GL_QUAD_STRIP);
-    angle = 0.0;
-    while( angle < 2*M_PI ) {
-        x = radius * cos(angle);
-        y = radius * sin(angle);
-        glNormal3d(-y * height, x*height, 0);
-        glVertex3d(x, y , height);
-        glVertex3d(x, y , 0.0);
-        angle = angle + angle_stepsize;
-    }
-    glVertex3d(radius, 0.0, height);
-    glVertex3d(radius, 0.0, 0.0);
-    glEnd();
-
-    glBegin(GL_POLYGON);
-    angle = 0.0;
-    while( angle < 2*M_PI ) {
-        x = radius * cos(angle);
-        y = radius * sin(angle);
-        glNormal3d(y*height, height*(radius-x), -radius*y);
-        glVertex3d(x, y , height);
-        angle = angle + angle_stepsize;
-    }
-    glVertex3d(radius, 0.0, height);
-    glEnd();
+    p->x = z*sin(angle) + x*cos(angle);
+    p->y = y;
+    p->z =  z*cos(angle) - x*sin(angle);
 }
 
 void Spider::draw() {
@@ -108,7 +73,7 @@ void Spider::move(bool forward){
     p->y = 0;
     p->z = 0;
 
-    rotate_point(p, angle);
+    rotate_point(p, angle*M_PI/180);
 
     position->x += p->x;
     position->z += p->z;
