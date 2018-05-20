@@ -113,3 +113,7 @@ void Spider::draw_leg(point *orig, double leg_ang, double artic_ang, double x_an
 
     glPopMatrix();
 }
+
+point *Spider::getPosition() {
+    return this->position;
+}
