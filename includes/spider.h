@@ -8,16 +8,27 @@
 
 #include "types.h"
 
+typedef enum {
+    walking_right,
+    stopped,
+    walking_left
+}State;
+
 class Spider {
 private:
     const double TORAX_SIZE = 2;
     const double LEG_SIZE = 5;
     const double LEG_RADIUS = 2;
-    const double MOVE_LENGTH = 1;
+    const double MOVE_LENGTH = 0.5;
     const double ROTATE_ANG = 10;
+    const int MAX_ITERATION = 3;
 
     point *position;
     double angle;
+    bool walking;
+    int iteration;
+    State currentState;
+    State oldState;
 
     void draw_leg(point *orig, double leg_ang, double artic_ang, double x_ang, bool sideRight);
 
