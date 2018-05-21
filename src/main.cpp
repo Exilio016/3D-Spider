@@ -99,7 +99,7 @@ void drawWCAxes()
 void displayCallback()
 {
     /** Limpa a janela APENAS uma vez */
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glColor3f(1.0f, 0.0f, 0.0f);
 
@@ -180,11 +180,16 @@ int main(int argc, char **argv)
 {
     /** Passo 1: Inicializa funções GLUT */
     glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
+    glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH);
     glutInitWindowPosition(100, 100);
     glutInitWindowSize(width, height);
     glutCreateWindow("Spider 3D");
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
 
     s = new Spider();
 

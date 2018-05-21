@@ -42,7 +42,7 @@ void Spider::draw() {
        if (i != 5 && i != 7 && i != 12 && i != 6) {
           point *o = new point;
          o->y = 0;
-    
+
          o->x = (TORAX_SIZE/2) * cos(M_PI*i/6);
          o->z = (TORAX_SIZE/2) * sin(M_PI*i/6);
 
@@ -50,9 +50,9 @@ void Spider::draw() {
          x_ang = (i == 8 ||i == 4) ? -45 : x_ang;
 
          if (i < 6)
-            draw_leg(o, 45, 45, x_ang, false);
+            draw_leg(o, 0, 45, x_ang, false);
          else
-            draw_leg(o, 45, 45, x_ang, true);
+            draw_leg(o, 0, 45, x_ang, true);
       }
     glPopMatrix();
     }
@@ -62,8 +62,13 @@ void Spider::draw() {
 
 Spider::Spider() {
     position = new point;
-    position->x = 0; position->y = 0; position->z = 0;
+    position->x = 0; position->y = TORAX_SIZE - TORAX_SIZE/10; position->z = 0;
     angle = 0;
+
+    iteration = 0;
+    walking = false;
+    currentState = stopped;
+    oldState = stopped;
 }
 
 void Spider::move(bool forward){
@@ -77,6 +82,7 @@ void Spider::move(bool forward){
 
     position->x += p->x;
     position->z += p->z;
+    walking = true;
 }
 
 void Spider::rotate(bool right){
@@ -84,6 +90,7 @@ void Spider::rotate(bool right){
     angle += signal * ROTATE_ANG;
     if (angle > 360) angle -= 360;
     if (angle < -360) angle += 360;
+    walking = true;
 }
 
 void Spider::draw_leg(point *orig, double leg_ang, double artic_ang, double x_ang, bool sideRight) {
@@ -93,9 +100,10 @@ void Spider::draw_leg(point *orig, double leg_ang, double artic_ang, double x_an
 
     glPushMatrix();
     glTranslated(orig->x, orig->y, orig->z);
+    glRotated(leg_ang, 0, 0, 1);
 
-    double ym = LEG_SIZE/2 * sin(leg_ang);
-    double zm = LEG_SIZE/2 * cos(leg_ang);
+    double ym = LEG_SIZE/2 * cos(20);
+    double zm = LEG_SIZE/2 * sin(20);
     double xm = zm * sin(x_ang);
 
     double y = ym - LEG_SIZE/2 * sin(artic_ang);
