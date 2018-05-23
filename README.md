@@ -16,7 +16,7 @@ sudo apt-get install cmake
 ## Install
 To install, you need to clone this repository
 ```shell
-git clone https://github.com/Exilio016/CG-Spider-2D.git
+git clone https://github.com/Exilio016/3D-Spider.git
 ```
 In the project directory, you need to compile using cmake
 ```shell
