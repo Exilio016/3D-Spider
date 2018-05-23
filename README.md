@@ -20,7 +20,7 @@ git clone https://github.com/Exilio016/CG-Spider-2D.git
 ```
 In the project directory, you need to compile using cmake
 ```shell
-cd CG-Spider-2D
+cd 3D-Spider
 cmake .
 make
 ```
