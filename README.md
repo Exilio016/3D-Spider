@@ -26,7 +26,7 @@ make
 ```
 Then you can run the file Aranha2D
 ```shell
-./Aranha2D
+./Spider
 ```
 ## LICENSE
 This project is licensed under the terms of the MIT license.
