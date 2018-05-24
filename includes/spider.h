@@ -21,7 +21,7 @@ private:
     const double LEG_RADIUS = 2;
     const double MOVE_LENGTH = 0.5;
     const double ROTATE_ANG = 10;
-    const int MAX_ITERATION = 3;
+    const int MAX_ITERATION = 24;
 
     point *position;
     double angle;
@@ -29,6 +29,14 @@ private:
     int iteration;
     State currentState;
     State oldState;
+
+    typedef struct {
+        double x_ang;
+        double leg_ang;
+        double artic_ang;
+    }leg_rotate;
+
+    leg_rotate legs[8];
 
     void draw_leg(point *orig, double leg_ang, double artic_ang, double x_ang, bool sideRight);
 
@@ -42,6 +50,12 @@ public:
     void rotate(bool right);
 
     point *getPosition();
+
+    void animate();
+
+    void walk_left(double ang);
+
+    void walk_right(double ang);
 };
 
 

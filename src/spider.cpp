@@ -6,6 +6,7 @@
 #include <GL/glut.h>
 #include <math.h>
 #include <types.h>
+#include <spider.h>
 
 
 void rotate_point (point *p, double angle){
@@ -35,28 +36,28 @@ void Spider::draw() {
     glutSolidSphere(TORAX_SIZE/2, 100, 100);
     glPopMatrix();
 
-    //TODO Draw spider legs
+    int k = 0;
     for (int i = 1; i < 12; i++) {
     glPushMatrix(); //Draw spider cephalothorax
     glTranslated(TORAX_SIZE/2 - TORAX_SIZE/8, 0, 0);
-       if (i != 5 && i != 7 && i != 12 && i != 6) {
+        if (i != 5 && i != 7 && i != 12 && i != 6) {
+
           point *o = new point;
          o->y = 0;
 
          o->x = (TORAX_SIZE/2) * cos(M_PI*i/6);
          o->z = (TORAX_SIZE/2) * sin(M_PI*i/6);
 
-         double x_ang = (i == 1 || i == 11 ) ? 45 : 0;
-         x_ang = (i == 8 ||i == 4) ? -45 : x_ang;
-
          if (i < 6)
-            draw_leg(o, 0, 45, x_ang, false);
+            draw_leg(o, legs[k].leg_ang, legs[k].artic_ang, legs[k].x_ang, false);
          else
-            draw_leg(o, 0, 45, x_ang, true);
+             draw_leg(o, legs[k].leg_ang, legs[k].artic_ang, legs[k].x_ang, true);
+
+         k++;
       }
     glPopMatrix();
-    }
-
+   }
+    animate();
     glPopMatrix();
 }
 
@@ -69,6 +70,91 @@ Spider::Spider() {
     walking = false;
     currentState = stopped;
     oldState = stopped;
+
+    int k = 0;
+    for (int i = 1; i < 12; i++) {
+        if (i != 5 && i != 7 && i != 12 && i != 6) {
+            double x_ang = (i == 1 || i == 11 ) ? 45 : 0;
+            x_ang = (i == 8 ||i == 4) ? -45 : x_ang;
+
+            legs[k].x_ang = x_ang;
+            legs[k].artic_ang = 70;
+            legs[k].leg_ang = -20;
+            k++;
+        }
+    }
+}
+
+void Spider::walk_left(double ang){
+    legs[0].x_ang -= ang;
+    legs[1].x_ang += ang;
+    legs[2].x_ang -= ang;
+    legs[3].x_ang += ang;
+
+    legs[4].x_ang += ang;
+    legs[5].x_ang -= ang;
+    legs[6].x_ang += ang;
+    legs[7].x_ang -= ang;
+
+}
+
+void Spider::walk_right(double ang){
+    legs[0].x_ang += ang;
+    legs[1].x_ang -= ang;
+    legs[2].x_ang += ang;
+    legs[3].x_ang -= ang;
+
+    legs[4].x_ang -= ang;
+    legs[5].x_ang += ang;
+    legs[6].x_ang -= ang;
+    legs[7].x_ang += ang;
+
+}
+
+void Spider::animate(){
+    double ang = 0.5;
+    if(currentState == walking_left){
+        if(iteration <= MAX_ITERATION){
+            walk_left(ang);
+            iteration++;
+        }
+        else{
+           iteration = 0;
+           currentState = stopped;
+           oldState = walking_left;
+        }
+    }
+    if(currentState == walking_right){
+        if(iteration <= MAX_ITERATION){
+            walk_right(ang);
+            iteration++;
+        }
+        else{
+            iteration = 0;
+            currentState = stopped;
+            oldState = walking_right;
+        }
+    }
+    else if (currentState == stopped){
+        if(iteration <= MAX_ITERATION){
+            walking = false;
+            if(oldState == walking_right)
+                walk_left(ang);
+
+            else if(oldState == walking_left)
+                walk_right(ang);
+            iteration++;
+        } else {
+            oldState = stopped;
+            if(walking){
+                iteration = 0;
+                if(oldState == walking_left) currentState = walking_right;
+                else currentState = walking_left;
+            }
+
+        }
+    }
+
 }
 
 void Spider::move(bool forward){
@@ -100,25 +186,25 @@ void Spider::draw_leg(point *orig, double leg_ang, double artic_ang, double x_an
 
     glPushMatrix();
     glTranslated(orig->x, orig->y, orig->z);
-    glRotated(leg_ang, 0, 0, 1);
 
-    double ym = LEG_SIZE/2 * cos(20);
-    double zm = LEG_SIZE/2 * sin(20);
-    double xm = zm * sin(x_ang);
-
-    double y = ym - LEG_SIZE/2 * sin(artic_ang);
-    double z = zm +  LEG_SIZE/2 * cos(artic_ang);
-    double x = z * sin(x_ang);
-
-    glLineWidth(LEG_RADIUS);
+    glPushMatrix();
+    glRotated(side*x_ang, 0, 1, 0);
+    glRotated(side*leg_ang, 1, 0, 0);
     glBegin(GL_LINES);
     glVertex3d(0, 0, 0);
-    glVertex3d(xm, ym, side*zm);
-    glVertex3d(xm, ym, side *zm);
-    glVertex3d(x, y, side*z);
+    glVertex3d(0, 0, side*LEG_SIZE/2);
     glEnd();
-    glLineWidth(1);
 
+    glPushMatrix();
+    glTranslated(0, 0, side*LEG_SIZE/2);
+    glRotated(side*artic_ang, 1, 0, 0);
+    glBegin(GL_LINES);
+    glVertex3d(0, 0, 0);
+    glVertex3d(0, 0, side*LEG_SIZE/2);
+    glEnd();
+    glPopMatrix();
+
+    glPopMatrix();
     glPopMatrix();
 }
 
