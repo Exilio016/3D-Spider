@@ -52,6 +52,9 @@ void drawAxes(float *basePoint, float *i, float *j, float *k)
  */
 void drawGrid(float size, float step)
 {
+    glPushMatrix();
+    glTranslated(-size/4,  0,  -size/4);
+
     float i;
     glColor3f(0.3, 0.3, 0.3);
     for(i = 0; i < size; i = i + step)
@@ -71,6 +74,7 @@ void drawGrid(float size, float step)
         glEnd();
         glTranslatef(0.0, 0.0, -i);
     }
+    glPopMatrix();
 }
 
 /**
@@ -167,6 +171,8 @@ void keyboard_callback(int key, int x, int y){
         s->rotate(false);
     if(key == GLUT_KEY_RIGHT)
         s->rotate(true);
+
+   // displayCallback();
 
 }
 
