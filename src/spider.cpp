@@ -146,7 +146,7 @@ void Spider::animate(){
             iteration++;
         } else {
             if(walking){
-                iteration = 0;
+                iteration =  0;
                 if(oldState == walking_left) currentState = walking_right;
                 else currentState = walking_left;
             }
