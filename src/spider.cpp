@@ -91,10 +91,10 @@ void Spider::walk_left(double ang){
     legs[2].x_ang -= ang;
     legs[3].x_ang += ang;
 
-    legs[4].x_ang += ang;
-    legs[5].x_ang -= ang;
-    legs[6].x_ang += ang;
-    legs[7].x_ang -= ang;
+    legs[4].x_ang -= ang;
+    legs[5].x_ang += ang;
+    legs[6].x_ang -= ang;
+    legs[7].x_ang += ang;
 
 }
 
@@ -104,15 +104,15 @@ void Spider::walk_right(double ang){
     legs[2].x_ang += ang;
     legs[3].x_ang -= ang;
 
-    legs[4].x_ang -= ang;
-    legs[5].x_ang += ang;
-    legs[6].x_ang -= ang;
-    legs[7].x_ang += ang;
+    legs[4].x_ang += ang;
+    legs[5].x_ang -= ang;
+    legs[6].x_ang += ang;
+    legs[7].x_ang -= ang;
 
 }
 
 void Spider::animate(){
-    double ang = 0.5;
+    double ang = 0.25;
     if(currentState == walking_left){
         if(iteration <= MAX_ITERATION){
             walk_left(ang);
@@ -145,9 +145,8 @@ void Spider::animate(){
                 walk_right(ang);
             iteration++;
         } else {
-            oldState = stopped;
             if(walking){
-                iteration = 0;
+                iteration =  0;
                 if(oldState == walking_left) currentState = walking_right;
                 else currentState = walking_left;
             }

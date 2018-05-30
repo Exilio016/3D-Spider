@@ -53,7 +53,7 @@ void drawAxes(float *basePoint, float *i, float *j, float *k)
 void drawGrid(float size, float step)
 {
     glPushMatrix();
-    glTranslated(-size/4,  0,  -size/4);
+    glTranslated(-size/2,  0,  -size / 2);
 
     float i;
     glColor3f(0.3, 0.3, 0.3);
