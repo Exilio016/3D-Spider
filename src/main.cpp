@@ -182,6 +182,16 @@ void update(int a){
     glutTimerFunc(1000/FRAMES, update, 0);
 }
 
+void lighting(){
+    GLfloat position_type[] = {1, 1, 1, 0};
+    glLightfv(GL_LIGHT0, GL_POSITION, position_type);
+
+    glEnable(GL_COLOR_MATERIAL);
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+
+}
+
 int main(int argc, char **argv)
 {
     /** Passo 1: Inicializa funções GLUT */
@@ -192,6 +202,7 @@ int main(int argc, char **argv)
     glutCreateWindow("Spider 3D");
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
+    lighting();
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
     glEnable(GL_CULL_FACE);
@@ -209,5 +220,3 @@ int main(int argc, char **argv)
     glutMainLoop();
     return 0;
 }
-
-
