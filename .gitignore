@@ -30,6 +30,7 @@
 *.exe
 *.out
 *.app
+Spider
 
 CMakeCache.txt
 CMakeFiles
