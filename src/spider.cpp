@@ -28,12 +28,16 @@ void Spider::draw() {
 
     glPushMatrix(); //Draw spider abdome
     glTranslated(-TORAX_SIZE, 0, 0);
-    glutSolidSphere(TORAX_SIZE, 100, 100);
+    //glutSolidSphere(TORAX_SIZE, 100, 100);
+    GLUquadric* quad = gluNewQuadric();
+    gluSphere(quad, TORAX_SIZE, 100, 100);
     glPopMatrix();
 
     glPushMatrix(); //Draw spider cephalothorax
     glTranslated(TORAX_SIZE/2 - TORAX_SIZE/8, 0, 0);
-    glutSolidSphere(TORAX_SIZE/2, 100, 100);
+    quad = gluNewQuadric();
+    gluSphere(quad, TORAX_SIZE/2, 100, 100);
+    //glutSolidSphere(TORAX_SIZE/2, 100, 100);
     glPopMatrix();
 
     int k = 0;
