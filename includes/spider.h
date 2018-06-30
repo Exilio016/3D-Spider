@@ -7,6 +7,8 @@
 
 
 #include "types.h"
+#include <opencv2/opencv.hpp>
+#include <GL/glut.h>
 
 typedef enum {
     walking_right,
@@ -22,6 +24,8 @@ private:
     const double MOVE_LENGTH = 0.5;
     const double ROTATE_ANG = 10;
     const int MAX_ITERATION = 24;
+    cv::Mat texSpider;
+    GLUquadric *bodyQuad;
 
     point *position;
     double angle;
