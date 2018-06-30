@@ -4,6 +4,7 @@
 
 #include "spider.h"
 #include <GL/glut.h>
+#include <opencv2/opencv.hpp>
 #include <math.h>
 #include <types.h>
 #include <spider.h>
@@ -19,26 +20,42 @@ void rotate_point (point *p, double angle){
     p->y = y;
     p->z =  z*cos(angle) - x*sin(angle);
 }
+GLUquadric* getTexQuad(cv::Mat img){
+    //Set spider texture
+
+    glEnable(GL_TEXTURE_2D);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img.cols, img.rows, 0, GL_BGR, GL_UNSIGNED_BYTE, img.data);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_REPEAT);
+    glActiveTexture(GL_TEXTURE0);
+
+    GLUquadric* quad = gluNewQuadric();
+    gluQuadricTexture(quad, GL_TRUE);
+    glDisable(GL_TEXTURE_2D);
+    return quad;
+}
 
 void Spider::draw() {
+
     glColor3f(1, 0, 0);
     glPushMatrix();
     glTranslated(position->x, position->y, position->z);
     glRotated(angle, 0, 1, 0);
 
+    glEnable(GL_TEXTURE_2D); //Ativa textura
     glPushMatrix(); //Draw spider abdome
     glTranslated(-TORAX_SIZE, 0, 0);
-    //glutSolidSphere(TORAX_SIZE, 100, 100);
-    GLUquadric* quad = gluNewQuadric();
-    gluSphere(quad, TORAX_SIZE, 100, 100);
+    gluSphere(bodyQuad, TORAX_SIZE, 100, 100);
     glPopMatrix();
 
     glPushMatrix(); //Draw spider cephalothorax
     glTranslated(TORAX_SIZE/2 - TORAX_SIZE/8, 0, 0);
-    quad = gluNewQuadric();
-    gluSphere(quad, TORAX_SIZE/2, 100, 100);
-    //glutSolidSphere(TORAX_SIZE/2, 100, 100);
+    gluSphere(bodyQuad, TORAX_SIZE/2, 100, 100);
     glPopMatrix();
+    glDisable(GL_TEXTURE_2D); //Desativa textura
 
     int k = 0;
     for (int i = 1; i < 12; i++) {
@@ -87,6 +104,11 @@ Spider::Spider() {
             k++;
         }
     }
+
+    texSpider = cv::imread("images/spider-body.jpg");
+    cv::flip(texSpider, texSpider, 0);
+
+    bodyQuad = getTexQuad(texSpider);
 }
 
 void Spider::walk_left(double ang){
