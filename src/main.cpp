@@ -19,6 +19,7 @@ int height = 600;
 Spider *s;
 bool fog = false;
 Mat groundTexture;
+bool grounded = false;
 
 /**
  * @desc Desenha eixos de um sistema de coordenadas.
@@ -52,12 +53,15 @@ void drawAxes(float *basePoint, float *i, float *j, float *k)
     glColor3f(currentColor[0], currentColor[1], currentColor[2]);
 }
 
-point pointify(GLfloat x, GLfloat y, GLfloat z) {
-   point p;
-   p.x = x;
-   p.y = y;
-   p.z = z;
-   return p;
+void setGroundTexture() {
+   glActiveTexture(GL_TEXTURE1);
+   glEnable(GL_TEXTURE_2D);
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, groundTexture.cols, groundTexture.rows, 0, GL_BGR, GL_UNSIGNED_BYTE, groundTexture.data);
+   glDisable(GL_TEXTURE_2D);
 }
 
 /**
@@ -66,83 +70,28 @@ point pointify(GLfloat x, GLfloat y, GLfloat z) {
  * @param {float} step Especifica a quantidade de intervalos de grades, causando a impressão de pisos no chão.
  */
 void drawGrid(float size, float step) {
-   vector<point> points;
-   vector<string> faces;
-   vector<GLenum> faces_index;
-   faces_index.push_back(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z); //front
-   faces.push_back("images/front.tga");
-   faces_index.push_back(GL_TEXTURE_CUBE_MAP_POSITIVE_Z); //back
-   faces.push_back("images/back.tga");
-   faces_index.push_back(GL_TEXTURE_CUBE_MAP_POSITIVE_X); //right
-   faces.push_back("images/right.tga");
-   faces_index.push_back(GL_TEXTURE_CUBE_MAP_NEGATIVE_X); //left
-   faces.push_back("images/left.tga");
-   faces_index.push_back(GL_TEXTURE_CUBE_MAP_POSITIVE_Y); //top
-   faces.push_back("images/top.tga");
-   faces_index.push_back(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y); //bottom
-   faces.push_back("images/bottom.tga");
-
-   points.push_back(pointify(-size,  size, -size));
-   points.push_back(pointify(-size, -size, -size));
-   points.push_back(pointify(size, -size, -size));
-   points.push_back(pointify(size, -size, -size));
-   points.push_back(pointify(size,  size, -size));
-   points.push_back(pointify(-size,  size, -size));
-
-   points.push_back(pointify(-size, -size,  size));
-   points.push_back(pointify(-size, -size, -size));
-   points.push_back(pointify(-size,  size, -size));
-   points.push_back(pointify(-size,  size, -size));
-   points.push_back(pointify(-size,  size,  size));
-   points.push_back(pointify(-size, -size,  size));
-
-   points.push_back(pointify(size, -size, -size));
-   points.push_back(pointify(size, -size,  size));
-   points.push_back(pointify(size,  size,  size));
-   points.push_back(pointify(size,  size,  size));
-   points.push_back(pointify(size,  size, -size));
-   points.push_back(pointify(size, -size, -size));
-
-   points.push_back(pointify(-size, -size,  size));
-   points.push_back(pointify(-size,  size,  size));
-   points.push_back(pointify(size,  size,  size));
-   points.push_back(pointify(size,  size,  size));
-   points.push_back(pointify(size, -size,  size));
-   points.push_back(pointify(-size, -size,  size));
-
-   points.push_back(pointify(-size,  size, -size));
-   points.push_back(pointify(size,  size, -size));
-   points.push_back(pointify(size,  size,  size));
-   points.push_back(pointify(size,  size,  size));
-   points.push_back(pointify(-size,  size,  size));
-   points.push_back(pointify(-size,  size, -size));
-
-   points.push_back(pointify(-size, -size, -size));
-   points.push_back(pointify(-size, -size,  size));
-   points.push_back(pointify(size, -size, -size));
-   points.push_back(pointify(size, -size, -size));
-   points.push_back(pointify(-size, -size,  size));
-   points.push_back(pointify(size, -size,  size));
-
-   for (int i = 0; i < faces.size(); i++) {
-      Mat img = imread(faces[i].c_str());
-      glTexImage2D(faces_index[i], 0, GL_RGB, img.cols, img.rows, 0, GL_BGR, GL_UNSIGNED_BYTE, img.ptr());
+   if (!grounded) {
+      setGroundTexture();
+      grounded = true;
    }
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+   glColor3f(1.0, 1.0, 1.0); 
+   glPushMatrix();
 
-   glEnable(GL_TEXTURE_CUBE_MAP);
-   glBegin(GL_QUADS);
-
-   for (int i = 0; i < points.size(); i++) {
-      glTexCoord3f(points[i].x, points[i].y, points[i].z);
-      glVertex3f(points[i].x, points[i].y, points[i].z);
-   }
+   glActiveTexture(GL_TEXTURE1);
+   glEnable(GL_TEXTURE_2D);
+   glBegin(GL_QUAD_STRIP);
+   glVertex3f(-size, 0.0, -size);
+   glVertex3f(size, 0.0, -size);
+   glVertex3f(size, 0.0, 0.0);
+   glVertex3f(-size, 0.0, 0.0);
+   glVertex3f(-size, 0.0, size);
+   glVertex3f(size, 0.0, size);
+   glVertex3f(size, 0.0, 0.0);
+   glVertex3f(0, 0.0, 0);
    glEnd();
-   glDisable(GL_TEXTURE_CUBE_MAP);
+
+   glPopMatrix();
+   glDisable(GL_TEXTURE_2D);
 }
 
 /**
@@ -281,7 +230,11 @@ void setFog(){
 }
 
 int main(int argc, char **argv) {
-   groundTexture = imread("./src/ground.bmp", CV_LOAD_IMAGE_COLOR);
+   groundTexture = imread("./images/ground.bmp", CV_LOAD_IMAGE_COLOR);
+   if (!groundTexture.data) {
+      std::cout<<"could not load ground texture\n";
+      return -1;
+   }
    /** Passo 1: Inicializa funções GLUT */
    glutInit(&argc, argv);
    glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH);
