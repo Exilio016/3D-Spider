@@ -40,11 +40,11 @@ GLUquadric* getTexQuad(cv::Mat img){
 
 void Spider::draw() {
 
-    glColor3f(1, 0, 0);
     glPushMatrix();
     glTranslated(position->x, position->y, position->z);
     glRotated(angle, 0, 1, 0);
 
+    glColor3f(1, 1, 1);
     glEnable(GL_TEXTURE_2D); //Ativa textura
     glPushMatrix(); //Draw spider abdome
     glTranslated(-TORAX_SIZE, 0, 0);
@@ -57,6 +57,7 @@ void Spider::draw() {
     glPopMatrix();
     glDisable(GL_TEXTURE_2D); //Desativa textura
 
+    glColor3f(1, 0, 0);
     int k = 0;
     for (int i = 1; i < 12; i++) {
     glPushMatrix(); //Draw spider cephalothorax

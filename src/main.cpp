@@ -11,6 +11,7 @@
 int width = 800;
 int height = 600;
 Spider *s;
+bool fog = false;
 
 
 /**
@@ -162,7 +163,7 @@ void reshapeCallback(int w, int h)
     glMatrixMode(GL_MODELVIEW);
 }
 
-void keyboard_callback(int key, int x, int y){
+void special_callback(int key, int x, int y){
     if(key == GLUT_KEY_UP)
         s->move(true);
     if(key == GLUT_KEY_DOWN)
@@ -173,6 +174,16 @@ void keyboard_callback(int key, int x, int y){
         s->rotate(true);
 
    // displayCallback();
+
+}
+
+void keyboard_callback(unsigned char key, int x, int y){
+  if(key == 'n'){
+    if(fog) glDisable(GL_FOG);
+    else glEnable(GL_FOG);
+
+    fog = !fog;
+  }
 
 }
 
@@ -192,6 +203,16 @@ void lighting(){
 
 }
 
+void setFog(){
+  GLfloat color[] = {0.5, 0.5, 0.5, 1.0};
+
+  glFogf(GL_FOG_MODE, GL_EXP);
+  glFogfv(GL_FOG_COLOR, color);
+  //glFogf(GL_FOG_START, 0);
+  //glFogf(GL_FOG_END, 300);
+  glFogf(GL_FOG_DENSITY, 0.15);
+}
+
 int main(int argc, char **argv)
 {
     /** Passo 1: Inicializa funções GLUT */
@@ -203,6 +224,7 @@ int main(int argc, char **argv)
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
     lighting();
+    setFog();
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
     glEnable(GL_CULL_FACE);
@@ -213,7 +235,8 @@ int main(int argc, char **argv)
     /** Passo 2: Registra callbacks da OpenGl */
     glutDisplayFunc(displayCallback);
     glutReshapeFunc(reshapeCallback);
-    glutSpecialFunc(keyboard_callback);
+    glutKeyboardFunc(keyboard_callback);
+    glutSpecialFunc(special_callback);
     glutTimerFunc(1000/FRAMES, update, 0);
 
     /** Passo 3: Executa o programa */
