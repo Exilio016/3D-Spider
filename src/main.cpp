@@ -20,7 +20,9 @@ Spider *s;
 bool fog = false;
 Mat groundTexture;
 bool grounded = false;
+bool skyBoxed = false;
 GLuint *textures;
+vector<point> skyBoxPoints;
 
 /**
  * @desc Desenha eixos de um sistema de coordenadas.
@@ -51,6 +53,118 @@ void drawAxes(float *basePoint, float *i, float *j, float *k){
     glEnd();
     /** Retorna para cor anterior */
     glColor3f(currentColor[0], currentColor[1], currentColor[2]);
+}
+
+point pointify(GLfloat x, GLfloat y, GLfloat z) {
+   point p;
+   p.x = x;
+   p.y = y;
+   p.z = z;
+   return p;
+}
+
+void setSkybox(float size) {
+   vector<string> faces;//nomes dos arquivos
+   vector<GLenum> faces_index;//tipo da textura cube map
+   glBindTexture(GL_TEXTURE_CUBE_MAP, textures[2]);
+   glEnable(GL_TEXTURE_CUBE_MAP);
+
+   faces_index.push_back(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z); //front
+   faces.push_back("images/front.png");
+   faces_index.push_back(GL_TEXTURE_CUBE_MAP_POSITIVE_Z); //back
+   faces.push_back("images/back.png");
+   faces_index.push_back(GL_TEXTURE_CUBE_MAP_POSITIVE_X); //right
+   faces.push_back("images/right.png");
+   faces_index.push_back(GL_TEXTURE_CUBE_MAP_NEGATIVE_X); //left
+   faces.push_back("images/left.png");
+   faces_index.push_back(GL_TEXTURE_CUBE_MAP_POSITIVE_Y); //top
+   faces.push_back("images/top.png");
+   faces_index.push_back(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y); //bottom
+   faces.push_back("images/bottom.png");
+
+   skyBoxPoints.push_back(pointify(-size,  size, -size));
+   skyBoxPoints.push_back(pointify(-size, -size, -size));
+   skyBoxPoints.push_back(pointify(size, -size, -size));
+   skyBoxPoints.push_back(pointify(size, -size, -size));
+   skyBoxPoints.push_back(pointify(size,  size, -size));
+   skyBoxPoints.push_back(pointify(-size,  size, -size));
+
+   skyBoxPoints.push_back(pointify(-size, -size,  size));
+   skyBoxPoints.push_back(pointify(-size, -size, -size));
+   skyBoxPoints.push_back(pointify(-size,  size, -size));
+   skyBoxPoints.push_back(pointify(-size,  size, -size));
+   skyBoxPoints.push_back(pointify(-size,  size,  size));
+   skyBoxPoints.push_back(pointify(-size, -size,  size));
+
+   skyBoxPoints.push_back(pointify(size, -size, -size));
+   skyBoxPoints.push_back(pointify(size, -size,  size));
+   skyBoxPoints.push_back(pointify(size,  size,  size));
+   skyBoxPoints.push_back(pointify(size,  size,  size));
+   skyBoxPoints.push_back(pointify(size,  size, -size));
+   skyBoxPoints.push_back(pointify(size, -size, -size));
+
+   skyBoxPoints.push_back(pointify(-size, -size,  size));
+   skyBoxPoints.push_back(pointify(-size,  size,  size));
+   skyBoxPoints.push_back(pointify(size,  size,  size));
+   skyBoxPoints.push_back(pointify(size,  size,  size));
+   skyBoxPoints.push_back(pointify(size, -size,  size));
+   skyBoxPoints.push_back(pointify(-size, -size,  size));
+
+   skyBoxPoints.push_back(pointify(-size,  size, -size));
+   skyBoxPoints.push_back(pointify(size,  size, -size));
+   skyBoxPoints.push_back(pointify(size,  size,  size));
+   skyBoxPoints.push_back(pointify(size,  size,  size));
+   skyBoxPoints.push_back(pointify(-size,  size,  size));
+   skyBoxPoints.push_back(pointify(-size,  size, -size));
+
+   skyBoxPoints.push_back(pointify(-size, -size, -size));
+   skyBoxPoints.push_back(pointify(-size, -size,  size));
+   skyBoxPoints.push_back(pointify(size, -size, -size));
+   skyBoxPoints.push_back(pointify(size, -size, -size));
+   skyBoxPoints.push_back(pointify(-size, -size,  size));
+   skyBoxPoints.push_back(pointify(size, -size,  size));
+
+   for (int i = 0; i < faces.size(); i++) {
+      Mat img = imread(faces[i].c_str());
+      if (!img.data) {
+         cout<<"could not load skybox\n";
+         return;
+      }
+      glTexImage2D(faces_index[i], 0, GL_RGB, img.cols, img.rows, 0, GL_BGR, GL_UNSIGNED_BYTE, img.ptr());
+   }
+   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+   glDisable(GL_TEXTURE_CUBE_MAP);
+}
+
+//chamada nos mesmos pontos q drawGrid
+void skybox(float size) {
+   if (!skyBoxed) {
+      setSkybox(size);
+      skyBoxed = true;
+   }
+   glColor3f(1.0, 1.0, 1.0);
+   glPushMatrix();
+   glBindTexture(GL_TEXTURE_CUBE_MAP, textures[2]);
+   glEnable(GL_TEXTURE_CUBE_MAP);
+
+   gluPerspective(90.0, 1, 0.1, 50); //test
+   gluLookAt(0.0, 0.0, 1.0,
+      0.0, 0.0, -1.0,
+      0.0, 1.0, 0.0);
+
+   glBegin(GL_QUADS);
+   for (int i = 0; i < skyBoxPoints.size(); i++) {
+      glTexCoord3f(skyBoxPoints[i].x, skyBoxPoints[i].y, skyBoxPoints[i].z);
+      glVertex3f(skyBoxPoints[i].x, skyBoxPoints[i].y, skyBoxPoints[i].z);
+   }
+   glEnd();
+   
+   glPopMatrix();
+   glDisable(GL_TEXTURE_CUBE_MAP);
 }
 
 void setGroundTexture() {
@@ -149,6 +263,7 @@ void displayCallback()
    glLoadIdentity();
    gluLookAt(3.0 + x, 2.0 + y, 10.0 + z, x, y, z, 0.0, 1.0, 0.0);
    drawGrid(300, 0.7);
+   skybox(300);
    drawWCAxes();
    s->draw();
 
@@ -156,6 +271,7 @@ void displayCallback()
    glLoadIdentity();
    gluLookAt(0.0 + x, 10.0 + y, 0.0 + z, x, y, z, 1.0, 0.0, 0.0);
    drawGrid(300, 0.7);
+   skybox(300);
    drawWCAxes();
    s->draw();
 
@@ -163,6 +279,7 @@ void displayCallback()
    glLoadIdentity();
    gluLookAt(10.0 + x, 0.0 + y, 0.0 + z, x, y, z, 0.0, 1.0, 0.0);
    drawGrid(300, 0.7);
+   skybox(300);
    drawWCAxes();
    s->draw();
 
@@ -170,6 +287,7 @@ void displayCallback()
    glLoadIdentity();
    gluLookAt(0.0 + x, 0.0 + y, 10.0 + z, x, y, z, 0.0, 1.0, 0.0);
    drawGrid(300, 0.7);
+   skybox(300);
    drawWCAxes();
    s->draw();
 
