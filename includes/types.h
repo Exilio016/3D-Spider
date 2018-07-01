@@ -13,5 +13,4 @@ typedef struct {
     GLdouble z;
 } point;
 
-
 #endif //SPIDER_TYPES_H
