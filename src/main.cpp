@@ -20,6 +20,7 @@ Spider *s;
 bool fog = false;
 Mat groundTexture;
 bool grounded = false;
+GLuint *textures;
 
 /**
  * @desc Desenha eixos de um sistema de coordenadas.
@@ -28,8 +29,7 @@ bool grounded = false;
  * @param {float*} j Segundo versor.
  * @param {float*} k Terceiro versor.
  */
-void drawAxes(float *basePoint, float *i, float *j, float *k)
-{
+void drawAxes(float *basePoint, float *i, float *j, float *k){
     float currentColor[4];
     /** Armazena cor atual */
     glGetFloatv(GL_CURRENT_COLOR, currentColor);
@@ -54,7 +54,7 @@ void drawAxes(float *basePoint, float *i, float *j, float *k)
 }
 
 void setGroundTexture() {
-   glActiveTexture(GL_TEXTURE1);
+   glBindTexture(GL_TEXTURE_2D, textures[0]);
    glEnable(GL_TEXTURE_2D);
    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -74,19 +74,34 @@ void drawGrid(float size, float step) {
       setGroundTexture();
       grounded = true;
    }
-   glColor3f(1.0, 1.0, 1.0); 
+   glColor3f(1.0, 1.0, 1.0);
    glPushMatrix();
 
-   glActiveTexture(GL_TEXTURE1);
+   glBindTexture(GL_TEXTURE_2D, textures[0]);
    glEnable(GL_TEXTURE_2D);
    glBegin(GL_QUAD_STRIP);
+   glTexCoord2f(0, 682);
    glVertex3f(-size, 0.0, -size);
+
+   glTexCoord2f(1023, 682);
    glVertex3f(size, 0.0, -size);
+
+   glTexCoord2f(1023, 0.5*682);
    glVertex3f(size, 0.0, 0.0);
+
+   glTexCoord2f(0, 0.5*682);
    glVertex3f(-size, 0.0, 0.0);
+
+   glTexCoord2f(0, 0);
    glVertex3f(-size, 0.0, size);
+
+   glTexCoord2f(1023, 0);
    glVertex3f(size, 0.0, size);
+
+   glTexCoord2f(1023, 0.5*682);
    glVertex3f(size, 0.0, 0.0);
+
+   glTexCoord2f(0.5*1023, 0.5*682);
    glVertex3f(0, 0.0, 0);
    glEnd();
 
@@ -230,7 +245,7 @@ void setFog(){
 }
 
 int main(int argc, char **argv) {
-   groundTexture = imread("./images/ground.bmp", CV_LOAD_IMAGE_COLOR);
+   groundTexture = imread("./images/ground.jpg", CV_LOAD_IMAGE_COLOR);
    if (!groundTexture.data) {
       std::cout<<"could not load ground texture\n";
       return -1;
@@ -243,6 +258,8 @@ int main(int argc, char **argv) {
    glutCreateWindow("Spider 3D");
    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
+   textures = new GLuint[3];
+   glGenTextures(3, textures);
    lighting();
    setFog();
    glEnable(GL_DEPTH_TEST);
@@ -250,8 +267,7 @@ int main(int argc, char **argv) {
    glEnable(GL_CULL_FACE);
    glCullFace(GL_BACK);
 
-   s = new Spider();
-
+   s = new Spider(textures);
    /** Passo 2: Registra callbacks da OpenGl */
    glutDisplayFunc(displayCallback);
    glutReshapeFunc(reshapeCallback);

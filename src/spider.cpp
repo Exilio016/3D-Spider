@@ -9,7 +9,6 @@
 #include <types.h>
 #include <spider.h>
 
-
 void rotate_point (point *p, double angle){
     double x,y,z;
     x = p->x;
@@ -20,30 +19,29 @@ void rotate_point (point *p, double angle){
     p->y = y;
     p->z =  z*cos(angle) - x*sin(angle);
 }
-GLUquadric* getTexQuad(cv::Mat img){
-    //Set spider texture
-
-    glActiveTexture(GL_TEXTURE0);
+GLUquadric* getTexQuad(cv::Mat img, GLuint *textures){
+    //Set spider
+    glBindTexture(GL_TEXTURE_2D, textures[1]);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img.cols, img.rows, 0, GL_BGR, GL_UNSIGNED_BYTE, img.data);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_REPEAT);
 
+    glEnable(GL_TEXTURE_2D);
     GLUquadric* quad = gluNewQuadric();
     gluQuadricTexture(quad, GL_TRUE);
     return quad;
+    glDisable(GL_TEXTURE_2D);
 }
 
 void Spider::draw() {
-   glActiveTexture(GL_TEXTURE0);
-    glEnable(GL_TEXTURE_2D);
     glPushMatrix();
     glTranslated(position->x, position->y, position->z);
     glRotated(angle, 0, 1, 0);
 
     glColor3f(1, 1, 1);
+    glBindTexture(GL_TEXTURE_2D, textures[1]);
     glEnable(GL_TEXTURE_2D); //Ativa textura
     glPushMatrix(); //Draw spider abdome
     glTranslated(-TORAX_SIZE, 0, 0);
@@ -83,7 +81,7 @@ void Spider::draw() {
     glDisable(GL_TEXTURE_2D);
 }
 
-Spider::Spider() {
+Spider::Spider(GLuint *textures) {
     position = new point;
     position->x = 0; position->y = TORAX_SIZE - TORAX_SIZE/10; position->z = 0;
     angle = 0;
@@ -92,6 +90,8 @@ Spider::Spider() {
     walking = false;
     currentState = stopped;
     oldState = stopped;
+    this->textures = textures;
+    printf("%p\n", textures);
 
     int k = 0;
     for (int i = 1; i < 12; i++) {
@@ -109,7 +109,7 @@ Spider::Spider() {
     texSpider = cv::imread("images/spider-body.jpg");
     cv::flip(texSpider, texSpider, 0);
 
-    bodyQuad = getTexQuad(texSpider);
+    bodyQuad = getTexQuad(texSpider, textures);
 }
 
 void Spider::walk_left(double ang){

@@ -45,7 +45,8 @@ private:
     void draw_leg(point *orig, double leg_ang, double artic_ang, double x_ang, bool sideRight);
 
 public:
-    Spider();
+    GLuint *textures;
+    Spider(GLuint *textures);
 
     void draw();
 
