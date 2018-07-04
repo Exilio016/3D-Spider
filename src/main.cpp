@@ -22,7 +22,6 @@ Mat groundTexture;
 bool grounded = false;
 bool skyBoxed = false;
 GLuint *textures;
-vector<point> skyBoxPoints;
 
 /**
  * @desc Desenha eixos de um sistema de coordenadas.
@@ -63,7 +62,7 @@ point pointify(GLfloat x, GLfloat y, GLfloat z) {
    return p;
 }
 
-void setSkybox(float size) {
+void setSkybox() {
    vector<string> faces;//nomes dos arquivos
    vector<GLenum> faces_index;//tipo da textura cube map
    glBindTexture(GL_TEXTURE_CUBE_MAP, textures[2]);
@@ -82,55 +81,13 @@ void setSkybox(float size) {
    faces_index.push_back(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y); //bottom
    faces.push_back("images/bottom.png");
 
-   skyBoxPoints.push_back(pointify(-size,  size, -size));
-   skyBoxPoints.push_back(pointify(-size, -size, -size));
-   skyBoxPoints.push_back(pointify(size, -size, -size));
-   skyBoxPoints.push_back(pointify(size, -size, -size));
-   skyBoxPoints.push_back(pointify(size,  size, -size));
-   skyBoxPoints.push_back(pointify(-size,  size, -size));
-
-   skyBoxPoints.push_back(pointify(-size, -size,  size));
-   skyBoxPoints.push_back(pointify(-size, -size, -size));
-   skyBoxPoints.push_back(pointify(-size,  size, -size));
-   skyBoxPoints.push_back(pointify(-size,  size, -size));
-   skyBoxPoints.push_back(pointify(-size,  size,  size));
-   skyBoxPoints.push_back(pointify(-size, -size,  size));
-
-   skyBoxPoints.push_back(pointify(size, -size, -size));
-   skyBoxPoints.push_back(pointify(size, -size,  size));
-   skyBoxPoints.push_back(pointify(size,  size,  size));
-   skyBoxPoints.push_back(pointify(size,  size,  size));
-   skyBoxPoints.push_back(pointify(size,  size, -size));
-   skyBoxPoints.push_back(pointify(size, -size, -size));
-
-   skyBoxPoints.push_back(pointify(-size, -size,  size));
-   skyBoxPoints.push_back(pointify(-size,  size,  size));
-   skyBoxPoints.push_back(pointify(size,  size,  size));
-   skyBoxPoints.push_back(pointify(size,  size,  size));
-   skyBoxPoints.push_back(pointify(size, -size,  size));
-   skyBoxPoints.push_back(pointify(-size, -size,  size));
-
-   skyBoxPoints.push_back(pointify(-size,  size, -size));
-   skyBoxPoints.push_back(pointify(size,  size, -size));
-   skyBoxPoints.push_back(pointify(size,  size,  size));
-   skyBoxPoints.push_back(pointify(size,  size,  size));
-   skyBoxPoints.push_back(pointify(-size,  size,  size));
-   skyBoxPoints.push_back(pointify(-size,  size, -size));
-
-   skyBoxPoints.push_back(pointify(-size, -size, -size));
-   skyBoxPoints.push_back(pointify(-size, -size,  size));
-   skyBoxPoints.push_back(pointify(size, -size, -size));
-   skyBoxPoints.push_back(pointify(size, -size, -size));
-   skyBoxPoints.push_back(pointify(-size, -size,  size));
-   skyBoxPoints.push_back(pointify(size, -size,  size));
-
    for (int i = 0; i < faces.size(); i++) {
       Mat img = imread(faces[i].c_str());
       if (!img.data) {
          cout<<"could not load skybox\n";
          return;
       }
-      glTexImage2D(faces_index[i], 0, GL_RGB, img.cols, img.rows, 0, GL_BGR, GL_UNSIGNED_BYTE, img.ptr());
+      glTexImage2D(faces_index[i], 0, GL_RGBA, img.cols, img.rows, 0, GL_BGR, GL_UNSIGNED_BYTE, img.ptr());
    }
    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -140,10 +97,97 @@ void setSkybox(float size) {
    glDisable(GL_TEXTURE_CUBE_MAP);
 }
 
+void drawSkybox(GLfloat tam) {
+   /*front*/
+   glBegin(GL_QUADS);
+   glTexCoord3f(-tam,  tam, -tam);
+   glVertex3f(-tam,  tam, -tam);
+   glTexCoord3f(-tam, -tam, -tam);
+   glVertex3f(-tam, -tam, -tam);
+   glTexCoord3f(tam, -tam, -tam);
+   glVertex3f(tam, -tam, -tam);
+   glTexCoord3f(tam,  tam, -tam);
+   glVertex3f(tam,  tam, -tam);
+   glTexCoord3f(-tam,  tam, -tam);
+   glVertex3f(-tam,  tam, -tam);
+   glEnd();
+
+   /**/
+   glBegin(GL_QUADS);
+   glTexCoord3f(-tam, -tam,  tam);
+   glVertex3f(-tam, -tam,  tam);
+   glTexCoord3f(-tam, -tam, -tam);
+   glVertex3f(-tam, -tam, -tam);
+   glTexCoord3f(-tam,  tam, -tam);
+   glVertex3f(-tam,  tam, -tam);
+   glTexCoord3f(-tam,  tam,  tam);
+   glVertex3f(-tam,  tam,  tam);
+   glTexCoord3f(-tam, -tam,  tam);
+   glVertex3f(-tam, -tam,  tam);
+   glEnd();
+
+   /**/
+   glBegin(GL_QUADS);
+   glTexCoord3f(tam, -tam, -tam);
+   glVertex3f(tam, -tam, -tam);
+   glTexCoord3f(tam, -tam,  tam);
+   glVertex3f(tam, -tam,  tam);
+   glTexCoord3f(tam,  tam,  tam);
+   glVertex3f(tam,  tam,  tam);
+   glTexCoord3f(tam,  tam, -tam);
+   glVertex3f(tam,  tam, -tam);
+   glTexCoord3f(tam, -tam, -tam);
+   glVertex3f(tam, -tam, -tam);
+   glEnd();
+
+   /**/
+   glBegin(GL_QUADS);
+   glTexCoord3f(-tam, -tam,  tam);
+   glVertex3f(-tam, -tam,  tam);
+   glTexCoord3f(-tam,  tam,  tam);
+   glVertex3f(-tam,  tam,  tam);
+   glTexCoord3f(tam,  tam,  tam);
+   glVertex3f(tam,  tam,  tam);
+   glTexCoord3f(tam, -tam,  tam);
+   glVertex3f(tam, -tam,  tam);
+   glTexCoord3f(-tam, -tam,  tam);
+   glVertex3f(-tam, -tam,  tam);
+   glEnd();
+
+   /**/
+   glBegin(GL_QUADS);
+   glTexCoord3f(-tam,  tam, -tam);
+   glVertex3f(-tam,  tam, -tam);
+   glTexCoord3f(tam,  tam, -tam);
+   glVertex3f(tam,  tam, -tam);
+   glTexCoord3f(tam,  tam,  tam);
+   glVertex3f(tam,  tam,  tam);
+   glTexCoord3f(-tam,  tam,  tam);
+   glVertex3f(-tam,  tam,  tam);
+   glTexCoord3f(-tam,  tam, -tam);
+   glVertex3f(-tam,  tam, -tam);
+   glEnd();
+
+   /**/
+   glBegin(GL_QUADS);
+   glTexCoord3f(-tam, -tam, -tam);
+   glVertex3f(-tam, -tam, -tam);
+   glTexCoord3f(-tam, -tam,  tam);
+   glVertex3f(-tam, -tam,  tam);
+   glTexCoord3f(tam, -tam, -tam);
+   glVertex3f(tam, -tam, -tam);
+   glTexCoord3f(-tam, -tam,  tam);
+   glVertex3f(-tam, -tam,  tam);
+   glTexCoord3f(tam, -tam,  tam);
+   glVertex3f(tam, -tam,  tam);
+   glEnd();
+}
+
+
 //chamada nos mesmos pontos q drawGrid
 void skybox(float size) {
    if (!skyBoxed) {
-      setSkybox(size);
+      setSkybox();
       skyBoxed = true;
    }
    glColor3f(1.0, 1.0, 1.0);
@@ -151,18 +195,8 @@ void skybox(float size) {
    glBindTexture(GL_TEXTURE_CUBE_MAP, textures[2]);
    glEnable(GL_TEXTURE_CUBE_MAP);
 
-   gluPerspective(90.0, 1, 0.1, 50); //test
-   gluLookAt(0.0, 0.0, 1.0,
-      0.0, 0.0, -1.0,
-      0.0, 1.0, 0.0);
+   drawSkybox(100);
 
-   glBegin(GL_QUADS);
-   for (int i = 0; i < skyBoxPoints.size(); i++) {
-      glTexCoord3f(skyBoxPoints[i].x, skyBoxPoints[i].y, skyBoxPoints[i].z);
-      glVertex3f(skyBoxPoints[i].x, skyBoxPoints[i].y, skyBoxPoints[i].z);
-   }
-   glEnd();
-   
    glPopMatrix();
    glDisable(GL_TEXTURE_CUBE_MAP);
 }
@@ -308,7 +342,7 @@ void reshapeCallback(int w, int h)
    /** Define o volume de vista */
    glMatrixMode(GL_PROJECTION);
    glLoadIdentity();
-   gluPerspective(65.0, (GLfloat) width/(GLfloat) height, 1.0, 20.0);
+   gluPerspective(65.0, (GLfloat) width/(GLfloat) height, 1.0, 600.0);
    glMatrixMode(GL_MODELVIEW);
 }
 
@@ -343,7 +377,7 @@ void update(int a){
 }
 
 void lighting(){
-   GLfloat position_type[] = {1, 1, 1, 0};
+   GLfloat position_type[] = {0, 80, 0, 0};
    glLightfv(GL_LIGHT0, GL_POSITION, position_type);
 
    glEnable(GL_COLOR_MATERIAL);
