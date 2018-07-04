@@ -20,6 +20,7 @@ Spider *s;
 bool fog = false;
 Mat groundTexture;
 bool grounded = false;
+bool skyBoxed = false;
 GLuint *textures;
 
 /**
@@ -51,6 +52,153 @@ void drawAxes(float *basePoint, float *i, float *j, float *k){
     glEnd();
     /** Retorna para cor anterior */
     glColor3f(currentColor[0], currentColor[1], currentColor[2]);
+}
+
+point pointify(GLfloat x, GLfloat y, GLfloat z) {
+   point p;
+   p.x = x;
+   p.y = y;
+   p.z = z;
+   return p;
+}
+
+void setSkybox() {
+   vector<string> faces;//nomes dos arquivos
+   vector<GLenum> faces_index;//tipo da textura cube map
+   glBindTexture(GL_TEXTURE_CUBE_MAP, textures[2]);
+   glEnable(GL_TEXTURE_CUBE_MAP);
+
+   faces_index.push_back(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z); //front
+   faces.push_back("images/front.png");
+   faces_index.push_back(GL_TEXTURE_CUBE_MAP_POSITIVE_Z); //back
+   faces.push_back("images/back.png");
+   faces_index.push_back(GL_TEXTURE_CUBE_MAP_POSITIVE_X); //right
+   faces.push_back("images/right.png");
+   faces_index.push_back(GL_TEXTURE_CUBE_MAP_NEGATIVE_X); //left
+   faces.push_back("images/left.png");
+   faces_index.push_back(GL_TEXTURE_CUBE_MAP_POSITIVE_Y); //top
+   faces.push_back("images/top.png");
+   faces_index.push_back(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y); //bottom
+   faces.push_back("images/bottom.png");
+
+   for (int i = 0; i < faces.size(); i++) {
+      Mat img = imread(faces[i].c_str());
+      if (!img.data) {
+         cout<<"could not load skybox\n";
+         return;
+      }
+      glTexImage2D(faces_index[i], 0, GL_RGBA, img.cols, img.rows, 0, GL_BGR, GL_UNSIGNED_BYTE, img.ptr());
+   }
+   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+   glDisable(GL_TEXTURE_CUBE_MAP);
+}
+
+void drawSkybox(GLfloat tam) {
+   /*front*/
+   glBegin(GL_QUADS);
+   glTexCoord3f(-tam,  tam, -tam);
+   glVertex3f(-tam,  tam, -tam);
+   glTexCoord3f(-tam, -tam, -tam);
+   glVertex3f(-tam, -tam, -tam);
+   glTexCoord3f(tam, -tam, -tam);
+   glVertex3f(tam, -tam, -tam);
+   glTexCoord3f(tam,  tam, -tam);
+   glVertex3f(tam,  tam, -tam);
+   glTexCoord3f(-tam,  tam, -tam);
+   glVertex3f(-tam,  tam, -tam);
+   glEnd();
+
+   /**/
+   glBegin(GL_QUADS);
+   glTexCoord3f(-tam, -tam,  tam);
+   glVertex3f(-tam, -tam,  tam);
+   glTexCoord3f(-tam, -tam, -tam);
+   glVertex3f(-tam, -tam, -tam);
+   glTexCoord3f(-tam,  tam, -tam);
+   glVertex3f(-tam,  tam, -tam);
+   glTexCoord3f(-tam,  tam,  tam);
+   glVertex3f(-tam,  tam,  tam);
+   glTexCoord3f(-tam, -tam,  tam);
+   glVertex3f(-tam, -tam,  tam);
+   glEnd();
+
+   /**/
+   glBegin(GL_QUADS);
+   glTexCoord3f(tam, -tam, -tam);
+   glVertex3f(tam, -tam, -tam);
+   glTexCoord3f(tam, -tam,  tam);
+   glVertex3f(tam, -tam,  tam);
+   glTexCoord3f(tam,  tam,  tam);
+   glVertex3f(tam,  tam,  tam);
+   glTexCoord3f(tam,  tam, -tam);
+   glVertex3f(tam,  tam, -tam);
+   glTexCoord3f(tam, -tam, -tam);
+   glVertex3f(tam, -tam, -tam);
+   glEnd();
+
+   /**/
+   glBegin(GL_QUADS);
+   glTexCoord3f(-tam, -tam,  tam);
+   glVertex3f(-tam, -tam,  tam);
+   glTexCoord3f(-tam,  tam,  tam);
+   glVertex3f(-tam,  tam,  tam);
+   glTexCoord3f(tam,  tam,  tam);
+   glVertex3f(tam,  tam,  tam);
+   glTexCoord3f(tam, -tam,  tam);
+   glVertex3f(tam, -tam,  tam);
+   glTexCoord3f(-tam, -tam,  tam);
+   glVertex3f(-tam, -tam,  tam);
+   glEnd();
+
+   /**/
+   glBegin(GL_QUADS);
+   glTexCoord3f(-tam,  tam, -tam);
+   glVertex3f(-tam,  tam, -tam);
+   glTexCoord3f(tam,  tam, -tam);
+   glVertex3f(tam,  tam, -tam);
+   glTexCoord3f(tam,  tam,  tam);
+   glVertex3f(tam,  tam,  tam);
+   glTexCoord3f(-tam,  tam,  tam);
+   glVertex3f(-tam,  tam,  tam);
+   glTexCoord3f(-tam,  tam, -tam);
+   glVertex3f(-tam,  tam, -tam);
+   glEnd();
+
+   /**/
+   glBegin(GL_QUADS);
+   glTexCoord3f(-tam, -tam, -tam);
+   glVertex3f(-tam, -tam, -tam);
+   glTexCoord3f(-tam, -tam,  tam);
+   glVertex3f(-tam, -tam,  tam);
+   glTexCoord3f(tam, -tam, -tam);
+   glVertex3f(tam, -tam, -tam);
+   glTexCoord3f(-tam, -tam,  tam);
+   glVertex3f(-tam, -tam,  tam);
+   glTexCoord3f(tam, -tam,  tam);
+   glVertex3f(tam, -tam,  tam);
+   glEnd();
+}
+
+
+//chamada nos mesmos pontos q drawGrid
+void skybox(float size) {
+   if (!skyBoxed) {
+      setSkybox();
+      skyBoxed = true;
+   }
+   glColor3f(1.0, 1.0, 1.0);
+   glPushMatrix();
+   glBindTexture(GL_TEXTURE_CUBE_MAP, textures[2]);
+   glEnable(GL_TEXTURE_CUBE_MAP);
+
+   drawSkybox(100);
+
+   glPopMatrix();
+   glDisable(GL_TEXTURE_CUBE_MAP);
 }
 
 void setGroundTexture() {
@@ -149,6 +297,7 @@ void displayCallback()
    glLoadIdentity();
    gluLookAt(3.0 + x, 2.0 + y, 10.0 + z, x, y, z, 0.0, 1.0, 0.0);
    drawGrid(300, 0.7);
+   skybox(300);
    drawWCAxes();
    s->draw();
 
@@ -156,6 +305,7 @@ void displayCallback()
    glLoadIdentity();
    gluLookAt(0.0 + x, 10.0 + y, 0.0 + z, x, y, z, 1.0, 0.0, 0.0);
    drawGrid(300, 0.7);
+   skybox(300);
    drawWCAxes();
    s->draw();
 
@@ -163,6 +313,7 @@ void displayCallback()
    glLoadIdentity();
    gluLookAt(10.0 + x, 0.0 + y, 0.0 + z, x, y, z, 0.0, 1.0, 0.0);
    drawGrid(300, 0.7);
+   skybox(300);
    drawWCAxes();
    s->draw();
 
@@ -170,6 +321,7 @@ void displayCallback()
    glLoadIdentity();
    gluLookAt(0.0 + x, 0.0 + y, 10.0 + z, x, y, z, 0.0, 1.0, 0.0);
    drawGrid(300, 0.7);
+   skybox(300);
    drawWCAxes();
    s->draw();
 
@@ -190,7 +342,7 @@ void reshapeCallback(int w, int h)
    /** Define o volume de vista */
    glMatrixMode(GL_PROJECTION);
    glLoadIdentity();
-   gluPerspective(65.0, (GLfloat) width/(GLfloat) height, 1.0, 20.0);
+   gluPerspective(65.0, (GLfloat) width/(GLfloat) height, 1.0, 600.0);
    glMatrixMode(GL_MODELVIEW);
 }
 
@@ -225,7 +377,7 @@ void update(int a){
 }
 
 void lighting(){
-   GLfloat position_type[] = {1, 1, 1, 0};
+   GLfloat position_type[] = {0, 80, 0, 0};
    glLightfv(GL_LIGHT0, GL_POSITION, position_type);
 
    glEnable(GL_COLOR_MATERIAL);
