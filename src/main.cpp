@@ -13,6 +13,9 @@ using namespace cv;
 using namespace std;
 
 #define FRAMES 24
+#define BOXTAM 100
+#define GROUND_WIDTH 300
+#define GROUND_HEIGHT 168
 
 int width = 800;
 int height = 600;
@@ -195,7 +198,7 @@ void skybox(float size) {
    glBindTexture(GL_TEXTURE_CUBE_MAP, textures[2]);
    glEnable(GL_TEXTURE_CUBE_MAP);
 
-   drawSkybox(100);
+   drawSkybox(BOXTAM);
 
    glPopMatrix();
    glDisable(GL_TEXTURE_CUBE_MAP);
@@ -228,28 +231,28 @@ void drawGrid(float size, float step) {
    glBindTexture(GL_TEXTURE_2D, textures[0]);
    glEnable(GL_TEXTURE_2D);
    glBegin(GL_QUAD_STRIP);
-   glTexCoord2f(0, 682);
+   glTexCoord2f(-GROUND_WIDTH/2, -GROUND_HEIGHT/2);
    glVertex3f(-size, 0.0, -size);
 
-   glTexCoord2f(1023, 682);
+   glTexCoord2f(GROUND_WIDTH/2, -GROUND_HEIGHT/2);
    glVertex3f(size, 0.0, -size);
 
-   glTexCoord2f(1023, 0.5*682);
+   glTexCoord2f(GROUND_WIDTH/2, 0);
    glVertex3f(size, 0.0, 0.0);
 
-   glTexCoord2f(0, 0.5*682);
+   glTexCoord2f(-GROUND_WIDTH/2, 0);
    glVertex3f(-size, 0.0, 0.0);
 
-   glTexCoord2f(0, 0);
+   glTexCoord2f(-GROUND_WIDTH/2, GROUND_HEIGHT/2);
    glVertex3f(-size, 0.0, size);
 
-   glTexCoord2f(1023, 0);
+   glTexCoord2f(GROUND_WIDTH/2, GROUND_HEIGHT/2);
    glVertex3f(size, 0.0, size);
 
-   glTexCoord2f(1023, 0.5*682);
+   glTexCoord2f(GROUND_WIDTH/2, 0);
    glVertex3f(size, 0.0, 0.0);
 
-   glTexCoord2f(0.5*1023, 0.5*682);
+   glTexCoord2f(0, 0);
    glVertex3f(0, 0.0, 0);
    glEnd();
 

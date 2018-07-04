@@ -9,6 +9,8 @@
 #include <types.h>
 #include <spider.h>
 
+#define BOXTAM 90
+
 void rotate_point (point *p, double angle){
     double x,y,z;
     x = p->x;
@@ -192,9 +194,11 @@ void Spider::move(bool forward){
 
     rotate_point(p, angle*M_PI/180);
 
-    position->x += p->x;
-    position->z += p->z;
-    walking = true;
+    if(fabs(position->x + p->x) < (BOXTAM - TORAX_SIZE) && fabs(position->z + p->z) < (BOXTAM - TORAX_SIZE)){
+      position->x += p->x;
+      position->z += p->z;
+      walking = true;
+    }
 }
 
 void Spider::rotate(bool right){
