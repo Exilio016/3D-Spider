@@ -2,7 +2,7 @@
 This project is a GLUT application that implements a spider that moves on the screen
 
 ## Dependencies
-To compile the project the following libraries is needed: OpenGL Utility Toolkit (GLUT), Miscellaneous Mesa GL, X11 miscellaneous utility library and X11 Input extension library. This can be done using the following commands
+To compile the project the following libraries is needed: OpenGL Utility Toolkit (GLUT), Miscellaneous Mesa GL, X11 miscellaneous utility library, X11 Input extension library and OpenCV2. This can be done using the following commands
 ```shell
 sudo apt-get install freeglut3-dev
 sudo apt-get install mesa-utils
